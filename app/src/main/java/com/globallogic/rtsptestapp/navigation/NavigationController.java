@@ -7,9 +7,6 @@ import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.location.Location;
 import android.media.MediaCodec;
-import android.media.MediaCodecInfo;
-import android.media.MediaFormat;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -40,9 +37,6 @@ import com.mapbox.services.android.navigation.v5.routeprogress.ProgressChangeLis
 import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgress;
 import com.mapbox.services.android.navigation.v5.routeprogress.RouteProgressState;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,9 +72,7 @@ public class NavigationController implements OnNavigationReadyCallback, Navigati
     private int readyViewsCount = 0;
 
 
-    private final SocketHelper socketHelper;
     private Surface inputSurface;
-    private MediaCodec videoEncoder;
     private boolean socketStarted = false;
     VirtualDisplay display;
 
@@ -96,8 +88,6 @@ public class NavigationController implements OnNavigationReadyCallback, Navigati
         this.mContext = fragmentActivity;
         this.mActivity = (TestActivity) fragmentActivity;
         mNavigationViewList = new ArrayList<>(2);
-        encoderCallback = new EncoderCallback();
-        socketHelper = new SocketHelper();
         createPresentation();
         startPresentation();
 
@@ -120,7 +110,6 @@ public class NavigationController implements OnNavigationReadyCallback, Navigati
 
         DisplayManager dm = (DisplayManager) getApplicationContext().getSystemService(DISPLAY_SERVICE);
 
-        prepareVideoEncoder(PRESENTATION_WIDTH, PRESENTATION_HEIGHT);
         display = dm.createVirtualDisplay("Recording Display", PRESENTATION_WIDTH,
                 PRESENTATION_HEIGHT, PRESENTATION_DENSITY, null, DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY,
                 null, null);
@@ -315,7 +304,6 @@ public class NavigationController implements OnNavigationReadyCallback, Navigati
 
     public void startRecording() {
         Log.d(TAG, "Start recording");
-        //socketHelper.createSocket();
         socketStarted=true;
         //display.setSurface(inputSurface);
         // Configures the SessionBuilder
@@ -327,7 +315,6 @@ public class NavigationController implements OnNavigationReadyCallback, Navigati
                 .setVideoEncoder(SessionBuilder.VIDEO_H264);
 
         mContext.startService(new Intent(mContext, RtspServer.class));
-        videoEncoder.start();
         Log.w(TAG, "createPresentation: surfaceView="+mSurfaceView );
 
 
@@ -338,41 +325,8 @@ public class NavigationController implements OnNavigationReadyCallback, Navigati
         releaseEncoders();
     }
 
-    private void prepareVideoEncoder(int width, int height) {
-        MediaFormat format = MediaFormat.createVideoFormat(VIDEO_MIME_TYPE, width, height);
-        // Set some required properties. The media codec may fail if these aren't defined.
-        format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
-                MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-        format.setInteger(MediaFormat.KEY_BIT_RATE, PRESENTATION_BITRATE); // 6Mbps
-        format.setInteger(MediaFormat.KEY_FRAME_RATE, PRESENTATION_FRAMERATE);
-        format.setInteger(MediaFormat.KEY_CAPTURE_RATE, PRESENTATION_FRAMERATE);
-        format.setInteger(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER, 1000000 / PRESENTATION_FRAMERATE);
-        format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
-        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1); // 1 seconds between I-frames
-
-        // Create a MediaCodec encoder and configure it. Get a Surface we can use for recording into.
-        try {
-            videoEncoder = MediaCodec.createEncoderByType(VIDEO_MIME_TYPE);
-            videoEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-            inputSurface = videoEncoder.createInputSurface();
-            videoEncoder.setCallback(encoderCallback);
-        } catch (IOException e) {
-            releaseEncoders();
-        }
-    }
 
     private void releaseEncoders() {
-        if (socketHelper != null) {
-            if (socketStarted) {
-                socketHelper.closeSocket();
-            }
-            socketStarted = false;
-        }
-        if (videoEncoder != null) {
-            videoEncoder.stop();
-            videoEncoder.release();
-            videoEncoder = null;
-        }
         if (inputSurface != null) {
             inputSurface.release();
             inputSurface = null;
@@ -383,65 +337,4 @@ public class NavigationController implements OnNavigationReadyCallback, Navigati
         return socketStarted;
     }
 
-    private class EncoderCallback extends MediaCodec.Callback {
-        @Override
-        public void onInputBufferAvailable(@NonNull MediaCodec codec, int index) {
-            Log.w(TAG, "onInputBufferAvailable: " +index);
-        }
-
-        @Override
-        public void onOutputBufferAvailable(@NonNull MediaCodec codec, int index, @NonNull MediaCodec.BufferInfo info) {
-
-            if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                Log.e(TAG, "onOutputBufferAvailable: EOS");
-                return;
-            }
-            ByteBuffer encodedData = videoEncoder.getOutputBuffer(index);
-            if (encodedData == null) {
-                throw new RuntimeException("couldn't fetch buffer at index " + index);
-            }
-            if (info.size != 0) {
-                if (socketStarted) {
-                    encodedData.position(info.offset);
-                    int size = encodedData.remaining();
-                    final byte[] buffer = new byte[size];
-                    encodedData.get(buffer);
-                    //writeSampleData(buffer, 0, size);
-                }else Log.w(TAG, "onOutputBufferAvailable: socket error" );
-            }else Log.w(TAG, "onOutputBufferAvailable: info.size=0" );
-            videoEncoder.releaseOutputBuffer(index, false);
-
-        }
-
-        @Override
-        public void onError(@NonNull MediaCodec codec, @NonNull MediaCodec.CodecException e) {
-            Log.e(TAG, "MediaCodec " + codec.getName() + " onError:", e);
-        }
-
-        @Override
-        public void onOutputFormatChanged(@NonNull MediaCodec codec, @NonNull MediaFormat format) {
-            Log.d(TAG, "Output Format changed");
-        }
-    }
-
-    private void writeSampleData(final byte[] buffer, final int offset, final int size) {
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                Log.w(TAG, "writeSampleData" );
-                if (socketHelper!= null && socketHelper.udpSocket!=null) {
-                    try {
-                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length, socketHelper.mReceiverIpAddr, SocketHelper.VIEWER_PORT);
-                        socketHelper.udpSocket.send(packet);
-                    } catch (IOException e) {
-                        Log.e(TAG, "Failed to write data to socket, stop casting",e);
-                        e.printStackTrace();
-                    }
-                }else {
-                    Log.e(TAG, "writeSampleData: socket null" );
-                }
-            }
-        });
-    }
 }
