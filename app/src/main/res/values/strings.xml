@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">RtspTestApp</string>
+    <string name="was_navigation_stopped">was_nav_stopped</string>
+</resources>
