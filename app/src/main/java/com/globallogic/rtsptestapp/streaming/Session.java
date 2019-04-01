@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
-package com.globallogic.rtsptestapp;
+package com.globallogic.rtsptestapp.streaming;
 
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 
-import com.globallogic.rtsptestapp.exceptions.CameraInUseException;
-import com.globallogic.rtsptestapp.exceptions.ConfNotSupportedException;
-import com.globallogic.rtsptestapp.exceptions.InvalidSurfaceException;
-import com.globallogic.rtsptestapp.exceptions.StorageUnavailableException;
+import com.globallogic.rtsptestapp.streaming.exceptions.CameraInUseException;
+import com.globallogic.rtsptestapp.streaming.exceptions.ConfNotSupportedException;
+import com.globallogic.rtsptestapp.streaming.exceptions.InvalidSurfaceException;
+import com.globallogic.rtsptestapp.streaming.exceptions.StorageUnavailableException;
 
 import java.io.IOException;
 import java.net.InetAddress;

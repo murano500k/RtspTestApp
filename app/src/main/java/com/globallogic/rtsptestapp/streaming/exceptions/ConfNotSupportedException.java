@@ -16,15 +16,13 @@
  * limitations under the License.
  */
 
-package com.globallogic.rtsptestapp.exceptions;
+package com.globallogic.rtsptestapp.streaming.exceptions;
 
-import java.io.IOException;
-
-public class StorageUnavailableException extends IOException {
+public class ConfNotSupportedException extends RuntimeException {
 	
-	public StorageUnavailableException(String message) {
+	public ConfNotSupportedException(String message) {
 		super(message);
 	}
-
-	private static final long serialVersionUID = -7537890350373995089L;
+	
+	private static final long serialVersionUID = 5876298277802827615L;
 }

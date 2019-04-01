@@ -16,8 +16,8 @@ import android.view.Surface;
 import android.view.View;
 
 import com.globallogic.rtsptestapp.R;
-import com.globallogic.rtsptestapp.RtspServer;
-import com.globallogic.rtsptestapp.SessionBuilder;
+import com.globallogic.rtsptestapp.streaming.RtspServer;
+import com.globallogic.rtsptestapp.streaming.SessionBuilder;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.geojson.Point;

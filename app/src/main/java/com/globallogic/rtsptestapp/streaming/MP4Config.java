@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.globallogic.rtsptestapp;
+package com.globallogic.rtsptestapp.streaming;
 
 import android.util.Base64;
 import android.util.Log;

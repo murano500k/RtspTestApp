@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-package com.globallogic.rtsptestapp.exceptions;
+package com.globallogic.rtsptestapp.streaming.exceptions;
 
-public class InvalidSurfaceException extends RuntimeException {
-
-	private static final long serialVersionUID = -7238661340093544496L;
-
-	public InvalidSurfaceException(String message) {
+public class CameraInUseException extends RuntimeException {
+	
+	public CameraInUseException(String message) {
 		super(message);
 	}
-
+	
+	private static final long serialVersionUID = -1866132102949435675L;
 }

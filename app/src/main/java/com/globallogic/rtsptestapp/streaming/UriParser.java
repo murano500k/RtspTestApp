@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.globallogic.rtsptestapp;
+package com.globallogic.rtsptestapp.streaming;
 
 import android.content.ContentValues;
 import android.hardware.Camera.CameraInfo;
@@ -28,8 +28,8 @@ import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.Set;
 
-import static com.globallogic.rtsptestapp.SessionBuilder.VIDEO_H264;
-import static com.globallogic.rtsptestapp.SessionBuilder.VIDEO_NONE;
+import static com.globallogic.rtsptestapp.streaming.SessionBuilder.VIDEO_H264;
+import static com.globallogic.rtsptestapp.streaming.SessionBuilder.VIDEO_NONE;
 
 
 /**

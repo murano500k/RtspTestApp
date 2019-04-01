@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.globallogic.rtsptestapp;
+package com.globallogic.rtsptestapp.streaming;
 
 import android.os.SystemClock;
 
@@ -26,8 +26,8 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-import static com.globallogic.rtsptestapp.RtpSocket.TRANSPORT_TCP;
-import static com.globallogic.rtsptestapp.RtpSocket.TRANSPORT_UDP;
+import static com.globallogic.rtsptestapp.streaming.RtpSocket.TRANSPORT_TCP;
+import static com.globallogic.rtsptestapp.streaming.RtpSocket.TRANSPORT_UDP;
 
 /**
  * Implementation of Sender Report RTCP packets.
