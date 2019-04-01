@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.location.Location;
-import android.media.MediaCodec;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -19,7 +18,6 @@ import android.view.View;
 import com.globallogic.rtsptestapp.R;
 import com.globallogic.rtsptestapp.RtspServer;
 import com.globallogic.rtsptestapp.SessionBuilder;
-import com.globallogic.rtsptestapp.SurfaceView;
 import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.geojson.Point;
@@ -76,17 +74,10 @@ public class NavigationController implements OnNavigationReadyCallback, Navigati
     private boolean socketStarted = false;
     VirtualDisplay display;
 
-    private static final String VIDEO_MIME_TYPE = "video/avc";
-
-    private MediaCodec.Callback encoderCallback;
-
-    private TestActivity mActivity;
-    private SurfaceView mSurfaceView;
 
 
     public NavigationController(FragmentActivity fragmentActivity) {
         this.mContext = fragmentActivity;
-        this.mActivity = (TestActivity) fragmentActivity;
         mNavigationViewList = new ArrayList<>(2);
         createPresentation();
         startPresentation();
@@ -238,9 +229,7 @@ public class NavigationController implements OnNavigationReadyCallback, Navigati
     }
 
 
-    public void initialize(SurfaceView surfaceView) {
-        Log.w(TAG, "initialize: surfaceView="+surfaceView );
-        this.mSurfaceView=surfaceView;
+    public void initialize() {
         for (NavigationView nav : mNavigationViewList) {
             nav.initialize(this);
         }
@@ -305,18 +294,14 @@ public class NavigationController implements OnNavigationReadyCallback, Navigati
     public void startRecording() {
         Log.d(TAG, "Start recording");
         socketStarted=true;
-        //display.setSurface(inputSurface);
         // Configures the SessionBuilder
         SessionBuilder.getInstance()
-                .setSurfaceView(mSurfaceView)
                 .setVirtualDisplay(display)
                 .setPreviewOrientation(90)
                 .setContext(getApplicationContext())
                 .setVideoEncoder(SessionBuilder.VIDEO_H264);
 
         mContext.startService(new Intent(mContext, RtspServer.class));
-        Log.w(TAG, "createPresentation: surfaceView="+mSurfaceView );
-
 
     }
 

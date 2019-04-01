@@ -10,14 +10,12 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.globallogic.rtsptestapp.R;
-import com.globallogic.rtsptestapp.SurfaceView;
 
 
 public class NavigationFragment extends Fragment {
   private static final String TAG = "NavigationFragment";
 
   private NavigationController mNavigationController;
-  private SurfaceView mSurfaceView;
 
   public static NavigationFragment newInstance() {
     Bundle args = new Bundle();
@@ -37,9 +35,8 @@ public class NavigationFragment extends Fragment {
     super.onViewCreated(view, savedInstanceState);
     FrameLayout navigationContainer = view.findViewById(R.id.navigation_view_container);
     navigationContainer.addView(mNavigationController.createNavigationView(navigationContainer));
-    mSurfaceView = (SurfaceView) view.findViewById(R.id.surface);
 
-    mNavigationController.initialize(mSurfaceView);
+    mNavigationController.initialize();
   }
 
   @Override

@@ -48,7 +48,6 @@ public class SessionBuilder {
 	private int mTimeToLive = 64;
 	private int mOrientation = 0;
 	private boolean mFlash = false;
-	private SurfaceView mSurfaceView = null;
 	private String mOrigin = null;
 	private String mDestination = null;
 	private Session.Callback mCallback = null;
@@ -101,7 +100,6 @@ public class SessionBuilder {
 		if (session.getVideoTrack()!=null) {
 			VideoStream video = session.getVideoTrack();
 			video.setVideoQuality(mVideoQuality);
-			video.setSurfaceView(mSurfaceView);
 			video.setVirtualDisplay(mVirtualDisplay);
 			video.setPreviewOrientation(mOrientation);
 			video.setDestinationPorts(5006);
@@ -160,13 +158,6 @@ public class SessionBuilder {
 		return this;
 	}
 
-	/** 
-	 * Sets the SurfaceView required to preview the video stream. 
-	 **/
-	public SessionBuilder setSurfaceView(SurfaceView surfaceView) {
-		mSurfaceView = surfaceView;
-		return this;
-	}
 
 	public SessionBuilder setVirtualDisplay(VirtualDisplay display) {
 		mVirtualDisplay = display;
@@ -226,11 +217,6 @@ public class SessionBuilder {
 		return mFlash;
 	}
 
-	/** Returns the SurfaceView set with {@link #setSurfaceView(SurfaceView)}. */
-	public SurfaceView getSurfaceView() {
-		return mSurfaceView;
-	}
-
 	/** Returns the time to live set with {@link #setTimeToLive(int)}. */
 	public int getTimeToLive() {
 		return mTimeToLive;
@@ -241,7 +227,6 @@ public class SessionBuilder {
 		return new SessionBuilder()
 		.setDestination(mDestination)
 		.setOrigin(mOrigin)
-		.setSurfaceView(mSurfaceView)
 		.setVirtualDisplay(mVirtualDisplay)
 		.setPreviewOrientation(mOrientation)
 		.setVideoQuality(mVideoQuality)

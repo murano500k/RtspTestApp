@@ -5,10 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.globallogic.rtsptestapp.SurfaceView
-        android:id="@+id/surface"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
     <FrameLayout
         android:id="@+id/navigation_view_container"
         android:layout_width="300dp"
